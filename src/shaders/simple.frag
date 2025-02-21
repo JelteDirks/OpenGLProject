@@ -12,7 +12,7 @@ const float THRESHOLD = 0.01;
 const float MAX_DISTANCE = 10.0;
 const vec3 sphere_position = vec3(-0.5, 0.0, 0.0);
 
-// PHONG constants
+// BLINN-PHONG constants
 const vec3 light_position = vec3(1.0, 1.0, -2.0);
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
 const vec3 ambient_color = vec3(0.1, 0.1, 0.1);
@@ -67,24 +67,23 @@ void main()
         }
 
         if (distance < THRESHOLD) {
-                        vec3 normal = get_normal(current_position);
+            vec3 normal = get_normal(current_position);
             vec3 light_dir = normalize(light_position - current_position);
             vec3 view_dir = normalize(-current_position);
-            vec3 reflect_dir = reflect(-light_dir, normal);
+            vec3 halfway_dir = normalize(light_dir + view_dir);
 
-            // Phong illumination model
+            // Blinn-Phong illumination model
             float diff = max(dot(normal, light_dir), 0.0);
-            float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
+            float spec = pow(max(dot(normal, halfway_dir), 0.0), shininess);
 
             vec3 ambient = ambient_color;
             vec3 diffuse = diff * light_color;
             vec3 specular = specular_strength * spec * light_color;
 
-            colour = object_color * (ambient + diffuse + specular);
+            colour = object_color * (ambient + diffuse) + specular;
             break;
         }
     }
-
 
     fragment_colour = vec4(colour, 1.0);
 }
