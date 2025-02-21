@@ -17,7 +17,7 @@ const float floor_level = -2.0;
 const vec3 light_position = vec3(3.0, 3.0, -4.0);
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
 const vec3 ambient_color = vec3(0.1, 0.1, 0.1);
-const vec3 object_color = vec3(0.0, 0.5, 0.0);
+const vec3 object_color = vec3(0.3, 0.7, 0.3);
 const float specular_strength = 0.5;
 const float shininess = 32.0;
 
@@ -32,21 +32,17 @@ vec3 rotate_arbitrary_axis(vec3 p, vec3 axis, float angle) {
 
 float box_sdf(vec3 point, vec3 dimensions)
 {
-    vec3 axis = vec3(1.0);
-    vec3 rotated = rotate_arbitrary_axis(point,
-                                         normalize(axis),
-                                         t_elapsed);
-    vec3 q = abs(rotated) - dimensions;
+    vec3 q = abs(point) - dimensions;
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
 float sphere_sdf(vec3 point, float radius) {
-    const float amplitude = 2.0;
+    const float amplitude = 1.3;
     const float frequency = 1.0;
     const float phase = 0.0;
 
     vec3 time_offset = vec3(
-        sin(frequency * t_elapsed) * amplitude + phase,
+        sin(frequency * t_elapsed + phase) * amplitude,
         0.0,
         0.0
     );
@@ -55,8 +51,18 @@ float sphere_sdf(vec3 point, float radius) {
 }
 
 float get_distance(vec3 point) {
-    float dist = sphere_sdf(point, 0.5);
-    dist = min(dist, box_sdf(point, vec3(0.3)));
+    float dist = sphere_sdf(point, 0.7);
+
+    vec3 axis = vec3(1.0);
+    vec3 rotated = rotate_arbitrary_axis(point,
+                                         normalize(axis),
+                                         t_elapsed);
+    dist = min(dist, box_sdf(rotated, vec3(0.3)));
+
+    dist = min(dist, box_sdf(point - vec3(0.0, 2.0, 0.0),
+                             vec3(2.0, 0.3, 0.3)
+                             )
+               );
     return dist;
 }
 
@@ -71,15 +77,18 @@ vec3 get_normal(vec3 point) {
 
 void main()
 {
-    vec2 xy_clip = ((gl_FragCoord.xy * 2 - window_dimensions) / window_dimensions.y) * 2;
-    vec3 ray_direction = vec3(0., 0., 1.);
-    vec3 ray_origin = vec3(xy_clip, -2);
+    vec2 xy_clip = ((gl_FragCoord.xy * 2 - window_dimensions) / window_dimensions.y) * 1.0;
+    vec3 ray_direction = normalize(vec3(xy_clip, 1.0));
+    vec3 ray_origin = vec3(0.0, 0.0, -4.0);
 
     float total_distance = 0.;
     vec3 colour = vec3(0.);
 
     for(int i = 0; i < MAX_ITERATIONS; ++i) {
         vec3 current_position = ray_origin + ray_direction * total_distance;
+        current_position = rotate_arbitrary_axis(current_position,
+                                                 normalize(vec3(0.,1.,0.)),
+                                                 sin(t_elapsed * 0.1));
         float distance = get_distance(current_position);
         total_distance += distance;
 
