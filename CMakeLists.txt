@@ -4,7 +4,11 @@ project(OpenGLProject LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(Gelly src/main.cpp external/glad/src/glad.c)
+add_executable(Gelly 
+  src/main.cpp 
+  src/VertexBuffer.cpp
+  src/IndexBuffer.cpp
+  external/glad/src/glad.c)
 
 add_subdirectory(external/glfw)
 

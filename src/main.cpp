@@ -2,7 +2,9 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
  
+#include "IndexBuffer.h"
 #include "linmath.h"
+#include "VertexBuffer.h"
  
 #include <string>
 #include <fstream>
@@ -16,13 +18,19 @@ typedef struct Vertex
     vec3 pos;
     vec3 col;
 } Vertex;
+
+#define N_VERTICES 4
+#define N_ELEMENTS N_VERTICES * 3
  
-static const Vertex vertices[3] =
+static const Vertex vertices[N_VERTICES] =
 {
-    { { -0.6f, -0.4f, 0.0f }, { 1.f, 0.f, 0.f } },
-    { {  0.6f, -0.4f, 0.0f }, { 0.f, 1.f, 0.f } },
-    { {   0.f,  0.6f, 0.0f }, { 0.f, 0.f, 1.f } }
+    { { -0.6f, -0.6f, 0.0f }, { 1.f, 0.f, 0.f } },
+    { {  0.6f, -0.6f, 0.0f }, { 0.f, 1.f, 0.f } },
+    { {  0.6f,  0.6f, 0.0f }, { 0.f, 0.f, 1.f } },
+    { { -0.6f,  0.6f, 0.0f }, { 1.f, 1.f, 1.f } },
 };
+
+static const GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
  
 static void error_callback(int error, const char* description)
 {
@@ -51,13 +59,13 @@ int getFileContent(const std::string& filename, std::string& content)
 
 int main(void)
 {
-    std::string _fragment_shader;
-    if (getFileContent("src/shaders/simple.frag", _fragment_shader)) {
+    std::string fragShader;
+    if (getFileContent("src/shaders/simple.frag", fragShader)) {
         exit(EXIT_FAILURE);
     }
 
-    std::string _vertex_shader;
-    if (getFileContent("src/shaders/simple.vert", _vertex_shader)) {
+    std::string vertShader;
+    if (getFileContent("src/shaders/simple.vert", vertShader)) {
         exit(EXIT_FAILURE);
     }
 
@@ -89,27 +97,24 @@ int main(void)
     glGenVertexArrays(1, &vertex_array);
     glBindVertexArray(vertex_array);
 
-    GLuint vertex_buffer;
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    VertexBuffer vb(vertices, sizeof(vertices));
+    IndexBuffer id(elements, sizeof(elements));
  
-    const GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    const char* vertSource = _vertex_shader.c_str();
-    glShaderSource(vertex_shader, 1, &vertSource, NULL);
-    glCompileShader(vertex_shader);
+    const GLuint glVertexShader = glCreateShader(GL_VERTEX_SHADER);
+    const char* vertSource = vertShader.c_str();
+    glShaderSource(glVertexShader, 1, &vertSource, NULL);
+    glCompileShader(glVertexShader);
  
-    const GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* fragSource = _fragment_shader.c_str();
-    glShaderSource(fragment_shader, 1, &fragSource, NULL);
-    glCompileShader(fragment_shader);
+    const GLuint glFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    const char* fragSource = fragShader.c_str();
+    glShaderSource(glFragmentShader, 1, &fragSource, NULL);
+    glCompileShader(glFragmentShader);
  
     const GLuint program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
+    glAttachShader(program, glVertexShader);
+    glAttachShader(program, glFragmentShader);
     glLinkProgram(program);
  
-    const GLint mvp_location = glGetUniformLocation(program, "MVP");
     const GLint vpos_location = glGetAttribLocation(program, "vPos");
     const GLint vcol_location = glGetAttribLocation(program, "vCol");
  
@@ -120,35 +125,25 @@ int main(void)
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(Vertex), (void*) offsetof(Vertex, col));
 
-    constexpr float FOV = 50.0f;
+    const GLint window_dim_location = glGetUniformLocation(program, "window_dimensions");
 
     while (!glfwWindowShouldClose(window))
     {
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
-        const float ratio = width / (float) height;
- 
+        glUniform2f(window_dim_location, width, height);
+
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
- 
-        mat4x4 m, p, mvp;
-        mat4x4_identity(m);
-        mat4x4_translate_in_place(m, 0.0f, 0.0f, -2.0f);
-        mat4x4_rotate(m, m, 1.0f, 1.0f, 1.0f, (float)glfwGetTime());
-        mat4x4_perspective(p, FOV * (M_PI / 180.0f), ratio, 0.1f, 10.0f);
-        mat4x4_mul(mvp, p, m);
-
         glUseProgram(program);
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) &mvp);
         glBindVertexArray(vertex_array);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
  
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
- 
+
     glfwDestroyWindow(window);
- 
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
