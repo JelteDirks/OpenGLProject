@@ -3,6 +3,8 @@
  
 #include "linmath.h"
  
+#include <string>
+#include <fstream>
 #include <iostream>
 #include <stdlib.h>
 #include <stddef.h>
@@ -21,27 +23,6 @@ static const Vertex vertices[3] =
     { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } }
 };
  
-static const char* vertex_shader_text =
-"#version 330\n"
-"uniform mat4 MVP;\n"
-"in vec3 vCol;\n"
-"in vec2 vPos;\n"
-"out vec3 color;\n"
-"void main()\n"
-"{\n"
-"    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
-"    color = vCol;\n"
-"}\n";
- 
-static const char* fragment_shader_text =
-"#version 330\n"
-"in vec3 color;\n"
-"out vec4 fragment;\n"
-"void main()\n"
-"{\n"
-"    fragment = vec4(color, 1.0);\n"
-"}\n";
- 
 static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
@@ -52,16 +33,40 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
- 
+
+int getFileContent(const std::string& filename, std::string& content)
+{
+    std::ifstream file(filename, std::ios::binary);
+
+    if (!file) {
+        std::cerr << "Error: Failed to open file: " << filename << std::endl;
+        return 1;
+    }
+
+    content.assign((std::istreambuf_iterator<char>(file)),
+                   std::istreambuf_iterator<char>());
+    return 0;
+}
+
 int main(void)
 {
+    std::string _fragment_shader;
+    if (getFileContent("src/shaders/simple.frag", _fragment_shader)) {
+        return 1; // TODO: error reporting
+    }
+
+    std::string _vertex_shader;
+    if (getFileContent("src/shaders/simple.vert", _vertex_shader)) {
+        return 1; // TODO: error reporting
+    }
+
     glfwSetErrorCallback(error_callback);
  
     if (!glfwInit())
         exit(EXIT_FAILURE);
  
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
  
     GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL Triangle", NULL, NULL);
@@ -88,11 +93,13 @@ int main(void)
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
  
     const GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
+    const char* vertSource = _vertex_shader.c_str();
+    glShaderSource(vertex_shader, 1, &vertSource, NULL);
     glCompileShader(vertex_shader);
  
     const GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
+    const char* fragSource = _fragment_shader.c_str();
+    glShaderSource(fragment_shader, 1, &fragSource, NULL);
     glCompileShader(fragment_shader);
  
     const GLuint program = glCreateProgram();
