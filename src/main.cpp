@@ -24,10 +24,10 @@ typedef struct Vertex
  
 static const Vertex vertices[N_VERTICES] =
 {
-    { { -0.6f, -0.6f, 0.0f }, { 1.f, 0.f, 0.f } },
-    { {  0.6f, -0.6f, 0.0f }, { 0.f, 1.f, 0.f } },
-    { {  0.6f,  0.6f, 0.0f }, { 0.f, 0.f, 1.f } },
-    { { -0.6f,  0.6f, 0.0f }, { 1.f, 1.f, 1.f } },
+    { { -1.0f, -1.0f, 0.0f }, { 1.f, 0.f, 0.f } },
+    { {  1.0f, -1.0f, 0.0f }, { 0.f, 1.f, 0.f } },
+    { {  1.0f,  1.0f, 0.0f }, { 0.f, 0.f, 1.f } },
+    { { -1.0f,  1.0f, 0.0f }, { 1.f, 1.f, 1.f } },
 };
 
 static const GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
