@@ -126,12 +126,15 @@ int main(void)
                           sizeof(Vertex), (void*) offsetof(Vertex, col));
 
     const GLint window_dim_location = glGetUniformLocation(program, "window_dimensions");
+    const GLint t_elapsed_location = glGetUniformLocation(program, "t_elapsed");
 
     while (!glfwWindowShouldClose(window))
     {
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         glUniform2f(window_dim_location, width, height);
+        float t_elapsed = glfwGetTime();
+        glUniform1f(t_elapsed_location, t_elapsed);
 
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
