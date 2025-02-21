@@ -13,7 +13,7 @@ const float MAX_DISTANCE = 10.0;
 const vec3 sphere_position = vec3(-0.5, 0.0, 0.0);
 
 // PHONG constants
-const vec3 light_position = vec3(1.0, 1.0, -1.0);
+const vec3 light_position = vec3(1.0, 1.0, -2.0);
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
 const vec3 ambient_color = vec3(0.1, 0.1, 0.1);
 const vec3 object_color = vec3(0.0, 0.5, 0.0);
@@ -22,7 +22,7 @@ const float shininess = 32.0;
 
 float sphere_sdf(vec3 point, float radius) {
     const float amplitude = 1.0;
-    const float frequency = 0.2;
+    const float frequency = 1.0;
     const float phase = 0.0;
 
     vec3 time_offset = vec3(
@@ -49,7 +49,7 @@ vec3 get_normal(vec3 point) {
 
 void main()
 {
-    vec2 xy_clip = (gl_FragCoord.xy * 2 - window_dimensions) / window_dimensions.y;
+    vec2 xy_clip = ((gl_FragCoord.xy * 2 - window_dimensions) / window_dimensions.y) * 2;
     vec3 ray_direction = vec3(0., 0., 1.);
     vec3 ray_origin = vec3(xy_clip, -2);
 
