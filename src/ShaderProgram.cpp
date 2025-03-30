@@ -32,7 +32,7 @@ ShaderProgram::ShaderProgram(const char *vertexShaderFile, const char *fragmentS
     glCompileShader(vertShaderInt);
 
     GLint response;
-    GLsizei len = 1024;
+    constexpr GLsizei len = 1024;
     GLchar infobuffer[len];
     GLsizei infolength;
 

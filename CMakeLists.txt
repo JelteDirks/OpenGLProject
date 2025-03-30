@@ -3,13 +3,17 @@ cmake_minimum_required(VERSION 3.10)
 project(OpenGLProject LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(Gelly 
+add_executable(Gelly
   src/main.cpp 
   src/VertexBuffer.cpp
   src/IndexBuffer.cpp
   src/util.cpp
   src/ShaderProgram.cpp
+  src/Scene.cpp
+  src/RenderContext.cpp
   external/glad/src/glad.c
   external/imgui/imgui.cpp
   external/imgui/imgui_draw.cpp
@@ -23,12 +27,13 @@ add_subdirectory(external/glfw)
 
 target_compile_definitions(Gelly PRIVATE GL_SILENCE_DEPRECATION)
 
-target_include_directories(Gelly PRIVATE external/glfw/include)
-target_include_directories(Gelly PRIVATE external/glad/include)
-target_include_directories(Gelly PRIVATE external/KHR/include)
-target_include_directories(Gelly PRIVATE external/imgui)
-target_include_directories(Gelly PRIVATE external/imgui/backends)
-
+target_include_directories(Gelly PRIVATE
+  external/glfw/include
+  external/glad/include
+  external/KHR/include
+  external/imgui
+  external/imgui/backends
+)
 
 target_link_libraries(Gelly PRIVATE glfw
   "-framework OpenGL"

@@ -28,7 +28,7 @@ build:
 build-release:
 	$(CMAKE) --build $(BUILD_DIR) --config Release
 
-run-release: build-release
+release: build-release
 	./$(BUILD_DIR)/Release/$(PROJECT_NAME)
 
 debug: build

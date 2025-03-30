@@ -1,21 +1,21 @@
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
+
 #include <cstdlib>
 
 #include <glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include "ShaderProgram.h"
  
-#include "IndexBuffer.h"
-#include "VertexBuffer.h"
-#include "types.h"
+#include "RenderContext.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include "util.h"
  
 #include <iostream>
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
-
-
 
 int main(void)
 {
@@ -37,47 +37,63 @@ int main(void)
     glfwSetKeyCallback(window, key_callback);
 
     glfwMakeContextCurrent(window);
+
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
+    ImGui::StyleColorsDark();
+
     gladLoadGL();
-
     std::cout << glGetString(GL_VERSION) << std::endl;
-
     glfwSwapInterval(1);
 
-    GLuint vertex_array;
-    glGenVertexArrays(1, &vertex_array);
-    glBindVertexArray(vertex_array);
+    auto renderContext = std::make_unique<RenderContext>();
+    auto scene = std::make_unique<Scene>();
 
-    VertexBuffer vb(vertices, sizeof(vertices));
-    IndexBuffer id(elements, sizeof(elements));
-
-    // exits with error if shaders do not compile
-    std::unique_ptr<ShaderProgram> shaderProgram = std::make_unique<ShaderProgram>
-        (TOSTRING(SHADER_PATH) "simple.vert",
-         TOSTRING(SHADER_PATH) "csg.frag");
-
-    GLuint program = shaderProgram->getProgram();
-    shaderProgram->use();
-
-    const GLint vpos_location = glGetAttribLocation(program, "aPos");
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), (void*) offsetof(Vertex, pos));
+    renderContext->use();
 
     while (!glfwWindowShouldClose(window))
     {
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui::NewFrame();
 
-        shaderProgram->use();
-        shaderProgram->setUniform2f("window_dimensions", width, height);
-        shaderProgram->setUniform1f("t_elapsed", glfwGetTime());
+        renderContext->render(scene, window);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+            static glm::vec3 clear_color;
+
+            ImGui::Begin("Hello, world!");
+
+            ImGui::Text("This is some useful text.");
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            ImGui::ColorEdit3("clear color", (float*)&clear_color);
+
+            if (ImGui::Button("Button")) {
+                counter++;
+            }
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            ImGui::End();
+        }
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();
