@@ -1,7 +1,8 @@
 #ifndef __INDEXBUFFER_H
 #define __INDEXBUFFER_H
 
-#include <glad.h>
+
+#include <OpenGL/gltypes.h>
 
 class IndexBuffer {
 private:

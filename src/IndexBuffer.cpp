@@ -1,4 +1,5 @@
 #include "IndexBuffer.h"
+#include <OpenGL/gl.h>
 
 IndexBuffer::IndexBuffer(const GLuint* indices, const GLsizeiptr size)
 {

@@ -1,12 +1,8 @@
-#version 330
+#version 330 core
 
-in vec3 vCol;
-in vec3 vPos;
-
-out vec3 color;
+in vec3 aPos;
 
 void main()
 {
-    gl_Position = vec4(vPos, 1.0);
-    color = vCol;
+    gl_Position = vec4(aPos, 1.0);
 }
