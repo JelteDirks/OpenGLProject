@@ -27,7 +27,7 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL Triangle", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(640, 480, "CSG Visualizer", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -50,7 +50,7 @@ int main(void)
     glfwSwapInterval(1);
 
     auto renderContext = std::make_unique<RenderContext>();
-    auto scene = std::make_unique<Scene>();
+    auto scene = std::make_unique<Scene>(io, window);
 
     renderContext->use();
 
@@ -61,28 +61,7 @@ int main(void)
         ImGui::NewFrame();
 
         renderContext->render(scene, window);
-
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-            static glm::vec3 clear_color;
-
-            ImGui::Begin("Hello, world!");
-
-            ImGui::Text("This is some useful text.");
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float*)&clear_color);
-
-            if (ImGui::Button("Button")) {
-                counter++;
-            }
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
+        scene->drawUI();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
