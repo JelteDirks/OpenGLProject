@@ -32,16 +32,20 @@ RenderContext::~RenderContext()
 {
 }
 
+void RenderContext::drawUI(Scene &scene, GLFWwindow &window)
+{
+}
+
 void RenderContext::use() const
 {
     shaderProgram->use();
     glBindVertexArray(VAO);
 }
 
-void RenderContext::render(std::unique_ptr<Scene> &scene, GLFWwindow *window)
+void RenderContext::render(Scene &scene, GLFWwindow &window)
 {
     int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
+    glfwGetFramebufferSize(&window, &width, &height);
     glViewport(0, 0, width, height);
     shaderProgram->setUniform2f("window_dimensions", width, height);
     shaderProgram->setUniform1f("t_elapsed", glfwGetTime());

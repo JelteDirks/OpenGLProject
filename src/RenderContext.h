@@ -10,8 +10,9 @@ class RenderContext {
 public:
 	RenderContext();
 	virtual ~RenderContext();
-	void render(std::unique_ptr<Scene> &scene, GLFWwindow *window);
+	void render(Scene &scene, GLFWwindow &window);
 	void use() const;
+	void drawUI(Scene &scene, GLFWwindow &window);
 
 private:
 	GLuint VAO;

@@ -11,6 +11,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "util.h"
+#include "Scene.h"
  
 #include <iostream>
 #include <stdlib.h>
@@ -50,9 +51,9 @@ int main(void)
     glfwSwapInterval(1);
 
     auto renderContext = std::make_unique<RenderContext>();
-    auto scene = std::make_unique<Scene>(io, window);
-
     renderContext->use();
+
+    auto scene = std::make_unique<Scene>(io, *window, *renderContext);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -60,8 +61,7 @@ int main(void)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
 
-        renderContext->render(scene, window);
-        scene->drawUI();
+        scene->render();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

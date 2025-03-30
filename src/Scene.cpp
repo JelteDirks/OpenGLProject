@@ -1,14 +1,22 @@
 #include <glm/glm.hpp>
+#include "RenderContext.h"
 #include "Scene.h"
 #include "imgui.h"
 
-Scene::Scene(ImGuiIO &ioref, GLFWwindow *windowref)
-:io(ioref), window(windowref)
+Scene::Scene(ImGuiIO &ioref, GLFWwindow &windowref, RenderContext &rendercontext)
+:io(ioref), window(windowref), renderContext(rendercontext)
 {
 }
 
 Scene::~Scene()
 {
+}
+
+void Scene::render()
+{
+    renderContext.render(*this, window);
+    drawUI();
+    renderContext.drawUI(*this, window);
 }
 
 void Scene::drawUI()
@@ -17,7 +25,7 @@ void Scene::drawUI()
     static int counter = 0;
     static glm::vec3 clear_color;
 
-    ImGui::Begin("Hello, world!");
+    ImGui::Begin("Scene settings");
 
     ImGui::Text("This is some useful text.");
 

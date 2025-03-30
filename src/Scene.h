@@ -3,17 +3,22 @@
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
+
+class RenderContext; // forward decl
+
 class Scene {
 public:
-	Scene(ImGuiIO &ioref, GLFWwindow *windowref);
+	Scene(ImGuiIO &ioref, GLFWwindow &windowref, RenderContext &rendercontext);
 	~Scene();
 
 	void drawUI();
 	bool dirty;
+	void render();
 
 private:
 	ImGuiIO &io;
-	GLFWwindow *window;
+	GLFWwindow &window;
+	RenderContext &renderContext;
 };
 
 #endif
