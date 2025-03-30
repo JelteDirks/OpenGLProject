@@ -1,13 +1,13 @@
-#version 330
+#version 330 core
 
 uniform float t_elapsed;
 uniform vec2 window_dimensions;
 
 out vec4 FragColour;
 
-const int MAX_ITERATIONS = 40;
+const int MAX_ITERATIONS = 300;
 const float THRESHOLD = 0.001;
-const float MAX_DISTANCE = 50.0;
+const float MAX_DISTANCE = 10.0;
 const float floor_level = -2.0;
 
 // BLINN-PHONG constants
@@ -17,6 +17,12 @@ const vec3 ambient_color = vec3(0.3, 0.3, 0.3);
 const vec3 object_color = vec3(0.3, 0.7, 0.3);
 const float specular_strength = 0.5;
 const float shininess = 32.0;
+
+// Additional lighting parameters
+const float attenuation_factor = 0.05;
+const vec3 rim_color = vec3(0.1, 0.3, 0.1);
+const float rim_power = 3.0;
+const float rim_intensity = 0.3;
 
 // Rodrigues formula for rotation
 vec3 rotate_arbitrary_axis(vec3 p, vec3 axis, float angle) {
@@ -69,27 +75,34 @@ vec3 get_normal(vec3 point) {
     ));
 }
 
-// Function to check if a point is in shadow
-vec3 get_shadow_scalar(vec3 point, vec3 light_pos) {
+// Improved shadow calculation with soft shadows
+float calculate_soft_shadow(vec3 point, vec3 light_pos, float k) {
     vec3 light_dir = normalize(light_pos - point);
     float distance_to_light = length(light_pos - point);
-    float shadow_distance = 0.0;
-    vec3 new_point = point + (get_normal(point) * THRESHOLD);
-    for(int i = 0; i < MAX_ITERATIONS * 100; ++i) {
+    float shadow_distance = 0.01;
+    float result = 1.0;
+    vec3 new_point = point + (get_normal(point) * THRESHOLD * 2.0);
+
+    for(int i = 0; i < 64; ++i) {
+        if(shadow_distance >= distance_to_light) break;
+
         vec3 shadow_position = new_point + light_dir * shadow_distance;
         float df = get_distance(shadow_position);
-        float distance = df;
 
-        if (distance < THRESHOLD) {
-            return vec3(0.4);
-        }
-        if (distance > distance_to_light) {
-            return vec3(1.0);
-        }
-        shadow_distance += distance;
+        if(df < THRESHOLD) return 0.1;
 
+        // Soft shadow calculation
+        result = min(result, k * df / shadow_distance);
+        shadow_distance += df;
     }
-    return vec3(1.0);
+
+    return clamp(result, 0.1, 1.0);
+}
+
+// Calculate light attenuation
+float calculate_attenuation(vec3 point, vec3 light_pos) {
+    float distance = length(light_pos - point);
+    return 1.0 / (1.0 + attenuation_factor * distance * distance);
 }
 
 void main()
@@ -111,27 +124,47 @@ void main()
         total_distance += distance;
 
         if (total_distance > MAX_DISTANCE) {
-            colour = vec3(0.0);
+            // Create a simple gradient background
+            float t = 0.5 * (ray_direction.y + 1.0);
+            colour = mix(vec3(0.5, 0.7, 1.0), vec3(0.1, 0.1, 0.3), t);
             break;
         }
 
         if (distance < THRESHOLD) {
+            // IMPROVED BLINN-PHONG SHADING
             vec3 normal = get_normal(current_position);
             vec3 light_dir = normalize(light_position - current_position);
-            vec3 view_dir = normalize(-current_position);
+            vec3 view_dir = normalize(ray_origin - current_position);
             vec3 halfway_dir = normalize(light_dir + view_dir);
 
+            // Basic lighting components
             float diff = max(dot(normal, light_dir), 0.0);
             float spec = pow(max(dot(normal, halfway_dir), 0.0), shininess);
 
-            vec3 ambient = ambient_color;
-            vec3 diffuse = diff * light_color;
-            vec3 specular = specular_strength * spec * light_color;
-            vec3 shadow_scalar = get_shadow_scalar(current_position, light_position);
+            // Calculate attenuation
+            float attenuation = calculate_attenuation(current_position, light_position);
 
-            colour = object_color * (ambient + diffuse) + (specular);
+            // Calculate soft shadows
+            float shadow = calculate_soft_shadow(current_position, light_position, 16.0);
 
-            colour *= shadow_scalar;
+            // Calculate rim lighting (emphasizes edges)
+            float rim = 1.0 - max(dot(normal, view_dir), 0.0);
+            rim = pow(rim, rim_power) * rim_intensity;
+
+            // Combine all lighting components
+            vec3 ambient = ambient_color * object_color;
+            vec3 diffuse = diff * light_color * object_color * attenuation;
+            vec3 specular = specular_strength * spec * light_color * attenuation;
+            vec3 rim_light = rim * rim_color;
+
+            // Apply shadow to diffuse and specular components
+            colour = ambient + (diffuse + specular) * shadow + rim_light;
+
+            // Add subtle color variations based on normals
+            colour += normal * 0.05;
+
+            // Apply gamma correction
+            colour = pow(colour, vec3(1.0/2.2));
 
             break;
         }

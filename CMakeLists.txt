@@ -10,7 +10,14 @@ add_executable(Gelly
   src/IndexBuffer.cpp
   src/util.cpp
   src/ShaderProgram.cpp
-  external/glad/src/glad.c)
+  external/glad/src/glad.c
+  external/imgui/imgui.cpp
+  external/imgui/imgui_draw.cpp
+  external/imgui/imgui_tables.cpp
+  external/imgui/imgui_widgets.cpp
+  external/imgui/backends/imgui_impl_glfw.cpp
+  external/imgui/backends/imgui_impl_opengl3.cpp
+)
 
 add_subdirectory(external/glfw)
 
@@ -19,6 +26,9 @@ target_compile_definitions(Gelly PRIVATE GL_SILENCE_DEPRECATION)
 target_include_directories(Gelly PRIVATE external/glfw/include)
 target_include_directories(Gelly PRIVATE external/glad/include)
 target_include_directories(Gelly PRIVATE external/KHR/include)
+target_include_directories(Gelly PRIVATE external/imgui)
+target_include_directories(Gelly PRIVATE external/imgui/backends)
+
 
 target_link_libraries(Gelly PRIVATE glfw
   "-framework OpenGL"

@@ -4,7 +4,9 @@
 #include <OpenGL/gltypes.h>
 #include <cstdint>
 #include <glm/glm.hpp>
+#include <string_view>
 #include <variant>
+#include <array>
 
 typedef struct Vertex
 {
@@ -39,8 +41,6 @@ enum class CSGOperation {
     INT = 1,
     DIFF = 2,
     MOD = 3,
-    SMUN = 4,
-    NOOP = 5, /* HACK: keep this as last item for the operation count */
 };
 
 enum class CSGShape {
@@ -48,9 +48,21 @@ enum class CSGShape {
     BOX = 1,
     CYL = 2,
     PLANE = 3,
-    NOSH = 4, /* HACK: keep this as last item for the shape count */
 };
 
 using CSGType = std::variant<CSGShape, CSGOperation>;
+
+constexpr std::array<std::pair<std::string_view, CSGOperation>, 4> operations = {{
+    {"Union", CSGOperation::UNI},
+    {"Intersection", CSGOperation::INT},
+    {"Difference", CSGOperation::DIFF},
+    {"Modulus", CSGOperation::MOD},
+}};
+
+constexpr std::array<std::pair<std::string_view, CSGShape>, 3> shapes = {{
+    {"Sphere", CSGShape::SPHERE},
+    {"Box", CSGShape::BOX},
+    {"Cyllinder", CSGShape::CYL},
+}};
 
 #endif
