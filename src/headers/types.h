@@ -10,21 +10,6 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-typedef struct Vertex
-{
-    glm::vec3 pos;
-} Vertex;
-
-constexpr int N_VERTICES = 4;
-constexpr int N_ELEMENTS = N_VERTICES * 3;
-constexpr Vertex vertices[N_VERTICES] =
-    {
-        { { -1.0f, -1.0f, 0.0f } },
-        { {  1.0f, -1.0f, 0.0f } },
-        { {  1.0f,  1.0f, 0.0f } },
-        { { -1.0f,  1.0f, 0.0f } },
-    };
-constexpr GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
 
 // NOTE: the struct and enums should be the same as the shader definition
 typedef struct LinearCSGTreeNode {

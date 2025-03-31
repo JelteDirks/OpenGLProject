@@ -8,6 +8,22 @@
 #include <memory>
 #include <vector>
 
+typedef struct Vertex
+{
+    glm::vec3 pos;
+} Vertex;
+
+constexpr int N_VERTICES = 4;
+constexpr int N_ELEMENTS = N_VERTICES * 3;
+constexpr Vertex vertices[N_VERTICES] =
+    {
+        { { -1.0f, -1.0f, 0.0f } },
+        { {  1.0f, -1.0f, 0.0f } },
+        { {  1.0f,  1.0f, 0.0f } },
+        { { -1.0f,  1.0f, 0.0f } },
+    };
+constexpr GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
+
 class RenderContext {
 public:
 	RenderContext();
