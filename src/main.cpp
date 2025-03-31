@@ -4,7 +4,6 @@
 
 #include <glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
  
 #include "RenderContext.h"
 #include "imgui.h"
@@ -28,7 +27,7 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(640, 480, "CSG Visualizer", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1200, 800, "CSG Visualizer", NULL, NULL);
     if (!window)
     {
         glfwTerminate();

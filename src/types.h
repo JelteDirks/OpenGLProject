@@ -3,10 +3,12 @@
 
 #include <OpenGL/gltypes.h>
 #include <cstdint>
-#include <glm/glm.hpp>
 #include <string_view>
 #include <variant>
 #include <array>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 
 typedef struct Vertex
 {

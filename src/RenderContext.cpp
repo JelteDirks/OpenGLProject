@@ -34,6 +34,9 @@ RenderContext::~RenderContext()
 
 void RenderContext::drawUI(Scene &scene, GLFWwindow &window)
 {
+    if (ImGui::CollapsingHeader("Render Settings")) {
+        ImGui::SliderFloat("Smoothing factor", &smoothingFactor, 0.00001f, 0.01f, "%0.8f");
+    }
 }
 
 void RenderContext::use() const

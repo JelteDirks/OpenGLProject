@@ -33,6 +33,7 @@ target_include_directories(Gelly PRIVATE
   external/KHR/include
   external/imgui
   external/imgui/backends
+  external/glm/glm
 )
 
 target_link_libraries(Gelly PRIVATE glfw

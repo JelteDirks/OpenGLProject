@@ -1,4 +1,3 @@
-#include <glm/glm.hpp>
 #include "RenderContext.h"
 #include "Scene.h"
 #include "imgui.h"
@@ -15,30 +14,21 @@ Scene::~Scene()
 void Scene::render()
 {
     renderContext.render(*this, window);
+    ImGui::Begin("Configuration");
     drawUI();
     renderContext.drawUI(*this, window);
+    ImGui::End();
 }
 
 void Scene::drawUI()
 {
-    static float f = 0.0f;
-    static int counter = 0;
-    static glm::vec3 clear_color;
-
-    ImGui::Begin("Scene settings");
-
-    ImGui::Text("This is some useful text.");
-
-    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-    ImGui::ColorEdit3("clear color", (float*)&clear_color);
-
-    if (ImGui::Button("Button")) {
-        counter++;
-    }
-    ImGui::SameLine();
-    ImGui::Text("counter = %d", counter);
-
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+    ImGui::Text("Framerate %.3f ms/frame (%.1f FPS)",
                 1000.0f / io.Framerate, io.Framerate);
-    ImGui::End();
+
+    if (ImGui::CollapsingHeader("Scene settings")) {
+        ImGui::ColorEdit3("Background colour", (float*)&backgroundColour);
+        ImGui::SliderFloat3("Camera position", (float*)&cameraPosition, -10.0, 10.0);
+        ImGui::SliderFloat3("Look at", (float*)&lookAt, -10.0, 10.0);
+        ImGui::SliderFloat("Field of view", (float*)&FOV, 40.0, 160.);
     }
+}

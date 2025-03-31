@@ -3,6 +3,7 @@
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
+#include <glm/vec3.hpp>
 
 class RenderContext; // forward decl
 
@@ -19,6 +20,11 @@ private:
 	ImGuiIO &io;
 	GLFWwindow &window;
 	RenderContext &renderContext;
+
+	glm::vec3 backgroundColour = glm::vec3(0.3f);
+	glm::vec3 cameraPosition = glm::vec3(0.0f);
+	glm::vec3 lookAt = glm::vec3(0.0f);
+	float FOV = 60;
 };
 
 #endif

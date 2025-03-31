@@ -4,7 +4,9 @@
 #include "GLFW/glfw3.h"
 #include "Scene.h"
 #include "ShaderProgram.h"
+#include "types.h"
 #include <memory>
+#include <vector>
 
 class RenderContext {
 public:
@@ -13,10 +15,13 @@ public:
 	void render(Scene &scene, GLFWwindow &window);
 	void use() const;
 	void drawUI(Scene &scene, GLFWwindow &window);
+	void linearizeScene(Scene &scene);
 
 private:
 	GLuint VAO;
 	std::unique_ptr<ShaderProgram> shaderProgram;
+	float smoothingFactor = 0.001f;
+	std::vector<LinearCSGTreeNode> linearScene{};
 };
 
 #endif
