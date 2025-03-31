@@ -13,6 +13,7 @@ add_executable(Gelly
   src/util.cpp
   src/ShaderProgram.cpp
   src/Scene.cpp
+  src/CSGNode.cpp
   src/RenderContext.cpp
   external/glad/src/glad.c
   external/imgui/imgui.cpp
