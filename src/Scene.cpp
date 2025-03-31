@@ -4,19 +4,20 @@
 
 Scene::Scene(ImGuiIO &ioref, GLFWwindow &windowref, RenderContext &rendercontext)
 :io(ioref), window(windowref), renderContext(rendercontext)
-{
-}
+{ }
 
 Scene::~Scene()
-{
-}
+{ }
+
+void Scene::addNode(std::shared_ptr<CSGNode> node)
+{ nodes.push_back(node); }
 
 void Scene::render()
 {
-    renderContext.render(*this, window);
+    renderContext.render(shared_from_this(), window);
     ImGui::Begin("Configuration");
     drawUI();
-    renderContext.drawUI(*this, window);
+    renderContext.drawUI(shared_from_this(), window);
     ImGui::End();
 }
 
@@ -30,9 +31,20 @@ void Scene::drawUI()
         ImGui::SliderFloat3("Camera position", (float*)&cameraPosition, -10.0, 10.0);
         ImGui::SliderFloat3("Look at", (float*)&lookAt, -10.0, 10.0);
         ImGui::SliderFloat("Field of view", (float*)&FOV, 40.0, 160.);
+    }
 
-        if (ImGui::Button("Test render")) {
-            this->dirty = true;
+    for (const auto &node : nodes) {
+        if (node->isOperation()) {
+            auto operation = std::static_pointer_cast<CSGOperationNode>(node);
+            operation->drawUI(shared_from_this());
+        } else if (node->isShape()) {
+            auto shapenode = std::static_pointer_cast<CSGShapeNode>(node);
+            shapenode->drawUI(shared_from_this());
         }
+    }
+
+
+    if (ImGui::Button("Test render")) {
+        this->dirty = true;
     }
 }

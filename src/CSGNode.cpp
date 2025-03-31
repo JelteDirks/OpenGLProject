@@ -1,10 +1,32 @@
 #include "CSGNode.h"
+#include "imgui.h"
 #include <memory>
 #include <vector>
 
 CSGShapeNode::CSGShapeNode(CSGShape shape)
 :CSGNode(shape)
 {
+}
+
+void CSGOperationNode::drawUI(std::shared_ptr<Scene> scene) const
+{
+    CSGOperation op = std::get<CSGOperation>(type);
+    if (ImGui::TreeNode(to_string(op))) {
+        ImGui::Text("Operation settings here");
+        for (auto childNode : getChildren()) {
+            childNode->drawUI(scene);
+        }
+        ImGui::TreePop();
+    }
+}
+
+void CSGShapeNode::drawUI(std::shared_ptr<Scene> scene) const
+{
+    CSGShape shape = std::get<CSGShape>(type);
+    if (ImGui::TreeNode(to_string(shape))) {
+        ImGui::Text("Shape settings here");
+        ImGui::TreePop();
+    }
 }
 
 CSGOperationNode::CSGOperationNode(CSGOperation op)
@@ -33,32 +55,19 @@ unsigned int CSGOperationNode::childCount()
     return count;
 }
 
-bool CSGOperationNode::addChild(std::shared_ptr<CSGNode> node)
-{
-    if (leftchild && rightchild) {
-        return false;
-    }
-    if (leftchild) {
-        rightchild = std::move(node);
-    } else {
-        leftchild = std::move(node);
-    }
-    return true;
-}
-
 CSGNode::CSGNode(CSGOperation op)
 :type(op)
 {
 }
 
-const std::vector<std::shared_ptr<CSGNode>> CSGOperationNode::getChildren() const
+std::vector<std::shared_ptr<CSGNode>> CSGOperationNode::getChildren() const
 {
-    std::vector<std::shared_ptr<CSGNode>> children{};
+    std::vector<std::shared_ptr<CSGNode>> children;
     if (leftchild) {
-        children.push_back(*leftchild);  // No need to create a new instance
+        children.push_back(leftchild);
     }
     if (rightchild) {
-        children.push_back(*rightchild);
+        children.push_back(rightchild);
     }
     return children;
 }

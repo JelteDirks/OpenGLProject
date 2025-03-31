@@ -33,7 +33,7 @@ RenderContext::~RenderContext()
 {
 }
 
-void RenderContext::drawUI(Scene &scene, GLFWwindow &window)
+void RenderContext::drawUI(std::shared_ptr<Scene> scene, GLFWwindow &window)
 {
     if (ImGui::CollapsingHeader("Render Settings")) {
         ImGui::SliderFloat("Smoothing factor", &smoothingFactor, 0.00001f, 0.01f, "%0.8f");
@@ -79,12 +79,12 @@ void RenderContext::linearizeCSGNode(const std::shared_ptr<CSGNode> &node)
     }
 }
 
-void RenderContext::linearizeScene(Scene &scene)
+void RenderContext::linearizeScene(std::shared_ptr<Scene> scene)
 {
     std::cout << "linearizing...\n";
     linearScene.clear();
     int counter = 0;
-    for (const auto &node : scene.getNodes()) {
+    for (const auto &node : scene->getNodes()) {
         linearizeCSGNode(node);
         ++counter;
     }
@@ -99,11 +99,11 @@ void RenderContext::linearizeScene(Scene &scene)
     }
 }
 
-void RenderContext::render(Scene &scene, GLFWwindow &window)
+void RenderContext::render(std::shared_ptr<Scene> scene, GLFWwindow &window)
 {
-    if (scene.dirty) {
+    if (scene->dirty) {
         linearizeScene(scene);
-        scene.dirty = false;
+        scene->dirty = false;
     }
 
     int width, height;

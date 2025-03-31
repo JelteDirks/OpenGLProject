@@ -28,15 +28,15 @@ class RenderContext {
 public:
     RenderContext();
     virtual ~RenderContext();
-    void render(Scene &scene, GLFWwindow &window);
+    void render(std::shared_ptr<Scene> scene, GLFWwindow &window);
     void use() const;
-    void drawUI(Scene &scene, GLFWwindow &window);
+    void drawUI(std::shared_ptr<Scene> scene, GLFWwindow &window);
 
     static std::shared_ptr<LinearCSGTreeNode> makeCSGTreeNode(const std::shared_ptr<CSGNode> &node);
 
 private:
     void linearizeCSGNode(const std::shared_ptr<CSGNode> &node);
-    void linearizeScene(Scene &scene);
+    void linearizeScene(std::shared_ptr<Scene> scene);
 
     GLuint VAO;
     std::unique_ptr<ShaderProgram> shaderProgram;

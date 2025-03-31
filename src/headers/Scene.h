@@ -9,7 +9,7 @@
 
 class RenderContext; // forward decl
 
-class Scene {
+class Scene: public std::enable_shared_from_this<Scene> {
 public:
 	Scene(ImGuiIO &ioref, GLFWwindow &windowref, RenderContext &rendercontext);
 	~Scene();
@@ -18,7 +18,7 @@ public:
 	bool dirty;
 	void render();
 
-	void addNode(std::shared_ptr<CSGNode> node) { nodes.push_back(node); };
+	void addNode(std::shared_ptr<CSGNode> node);
 	const std::vector<std::shared_ptr<CSGNode>> &getNodes() { return nodes; };
 
 private:

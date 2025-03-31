@@ -39,6 +39,28 @@ enum class CSGShape {
     NOSH,
 };
 
+constexpr const char* to_string(CSGOperation op) {
+    switch (op) {
+        case CSGOperation::UNI:  return "Union";
+        case CSGOperation::INT:  return "Intersection";
+        case CSGOperation::DIFF: return "Difference";
+        case CSGOperation::MOD:  return "Modulo";
+        case CSGOperation::NOOP: return "No Operation";
+        default:                 return "Unknown Operation";
+    }
+}
+
+constexpr const char* to_string(CSGShape shape) {
+    switch (shape) {
+        case CSGShape::SPHERE: return "Sphere";
+        case CSGShape::BOX:    return "Box";
+        case CSGShape::CYL:    return "Cylinder";
+        case CSGShape::PLANE:  return "Plane";
+        case CSGShape::NOSH:   return "No Shape";
+        default:               return "Unknown Shape";
+    }
+}
+
 using CSGType = std::variant<CSGShape, CSGOperation>;
 
 constexpr std::array<std::pair<std::string_view, CSGOperation>, 4> operations = {{
