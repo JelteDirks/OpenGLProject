@@ -28,6 +28,7 @@ add_subdirectory(external/glfw)
 target_compile_definitions(Gelly PRIVATE GL_SILENCE_DEPRECATION)
 
 target_include_directories(Gelly PRIVATE
+  src/headers
   external/glfw/include
   external/glad/include
   external/KHR/include
