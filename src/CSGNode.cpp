@@ -21,6 +21,31 @@ CSGNode::CSGNode(CSGShape shape)
 {
 }
 
+unsigned int CSGOperationNode::childCount()
+{
+    unsigned int count = 0;
+    if (leftchild) {
+        ++count;
+    }
+    if (rightchild) {
+        ++count;
+    }
+    return count;
+}
+
+bool CSGOperationNode::addChild(std::shared_ptr<CSGNode> node)
+{
+    if (leftchild && rightchild) {
+        return false;
+    }
+    if (leftchild) {
+        rightchild = std::move(node);
+    } else {
+        leftchild = std::move(node);
+    }
+    return true;
+}
+
 CSGNode::CSGNode(CSGOperation op)
 :type(op)
 {

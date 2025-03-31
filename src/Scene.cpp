@@ -30,5 +30,9 @@ void Scene::drawUI()
         ImGui::SliderFloat3("Camera position", (float*)&cameraPosition, -10.0, 10.0);
         ImGui::SliderFloat3("Look at", (float*)&lookAt, -10.0, 10.0);
         ImGui::SliderFloat("Field of view", (float*)&FOV, 40.0, 160.);
+
+        if (ImGui::Button("Test render")) {
+            this->dirty = true;
+        }
     }
 }

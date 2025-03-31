@@ -34,6 +34,10 @@ public:
 	std::optional<CSGShape> getShape() const { return std::nullopt; };
 	std::optional<CSGOperation> getOperation() const { return std::get<CSGOperation>(type); };
 	const std::vector<std::shared_ptr<CSGNode>> getChildren() const;
+
+	void clearChildren() { leftchild = {}; rightchild = {}; };
+	unsigned int childCount();
+	bool addChild(std::shared_ptr<CSGNode> node);
 private:
 	std::optional<std::shared_ptr<CSGNode>> leftchild;
 	std::optional<std::shared_ptr<CSGNode>> rightchild;

@@ -3,6 +3,7 @@
 #include "RenderContext.h"
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
+#include <iostream>
 
 RenderContext::RenderContext()
 {
@@ -45,14 +46,64 @@ void RenderContext::use() const
     glBindVertexArray(VAO);
 }
 
+std::shared_ptr<LinearCSGTreeNode> RenderContext::makeCSGTreeNode(const std::shared_ptr<CSGNode> &node)
+{
+    auto lnode = std::make_shared<LinearCSGTreeNode>();
+
+    if (auto op = node->getOperation()) {
+        lnode->op = static_cast<int>(*op);
+        lnode->shape = static_cast<int>(CSGShape::NOSH);
+    } else if (auto shape = node->getShape()) {
+        lnode->shape = static_cast<int>(*shape);
+        lnode->op = static_cast<int>(CSGOperation::NOOP);
+    } else {
+        throw std::logic_error("can not make linear csgtree node from this");
+    }
+
+    return lnode;
+}
+
+void RenderContext::linearizeCSGNode(const std::shared_ptr<CSGNode> &node)
+{
+    if (auto op = node->getOperation()) {
+        for (auto child : static_cast<CSGOperationNode>(*op).getChildren()) {
+            linearizeCSGNode(child);
+        }
+        auto lnode = RenderContext::makeCSGTreeNode(node);
+        linearScene.push_back(lnode);
+    } else if (auto shape = node->getShape()) {
+        auto lnode = RenderContext::makeCSGTreeNode(node);
+        linearScene.push_back(lnode);
+    } else {
+        throw std::logic_error("should be shape or operation");
+    }
+}
+
 void RenderContext::linearizeScene(Scene &scene)
 {
+    std::cout << "linearizing...\n";
+    linearScene.clear();
+    int counter = 0;
+    for (const auto &node : scene.getNodes()) {
+        linearizeCSGNode(node);
+        ++counter;
+    }
+
+    for (int i = 0; i < counter - 1; ++i) {
+        auto unionShape = std::make_shared<CSGOperationNode>(CSGOperation::UNI);
+        linearScene.push_back(RenderContext::makeCSGTreeNode(unionShape));
+    }
+
+    for (auto x : linearScene) {
+        std::cout << x->op << x->shape << std::endl;
+    }
 }
 
 void RenderContext::render(Scene &scene, GLFWwindow &window)
 {
     if (scene.dirty) {
         linearizeScene(scene);
+        scene.dirty = false;
     }
 
     int width, height;

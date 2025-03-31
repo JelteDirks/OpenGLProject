@@ -32,13 +32,16 @@ public:
     void use() const;
     void drawUI(Scene &scene, GLFWwindow &window);
 
+    static std::shared_ptr<LinearCSGTreeNode> makeCSGTreeNode(const std::shared_ptr<CSGNode> &node);
+
 private:
+    void linearizeCSGNode(const std::shared_ptr<CSGNode> &node);
     void linearizeScene(Scene &scene);
 
     GLuint VAO;
     std::unique_ptr<ShaderProgram> shaderProgram;
     float smoothingFactor = 0.001f;
-    std::vector<LinearCSGTreeNode> linearScene{};
+    std::vector<std::shared_ptr<LinearCSGTreeNode>> linearScene{};
 };
 
 #endif

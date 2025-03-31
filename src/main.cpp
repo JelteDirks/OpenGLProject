@@ -53,6 +53,13 @@ int main(void)
     renderContext->use();
 
     auto scene = std::make_unique<Scene>(io, *window, *renderContext);
+    auto box = std::make_shared<CSGShapeNode>(CSGShape::BOX);
+    auto sphere = std::make_shared<CSGShapeNode>(CSGShape::SPHERE);
+    auto uniNode = std::make_shared<CSGOperationNode>(CSGOperation::UNI);
+
+    uniNode->addChild(std::move(box));
+    uniNode->addChild(std::move(sphere));
+    scene->addNode(std::move(uniNode));
 
     while (!glfwWindowShouldClose(window))
     {
