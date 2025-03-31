@@ -28,6 +28,7 @@ enum class CSGOperation {
     INT = 1,
     DIFF = 2,
     MOD = 3,
+    NOOP,
 };
 
 enum class CSGShape {
@@ -35,6 +36,7 @@ enum class CSGShape {
     BOX = 1,
     CYL = 2,
     PLANE = 3,
+    NOSH,
 };
 
 using CSGType = std::variant<CSGShape, CSGOperation>;
