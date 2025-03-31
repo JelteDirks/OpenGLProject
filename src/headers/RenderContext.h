@@ -31,9 +31,10 @@ public:
     void render(Scene &scene, GLFWwindow &window);
     void use() const;
     void drawUI(Scene &scene, GLFWwindow &window);
-    void linearizeScene(Scene &scene);
 
 private:
+    void linearizeScene(Scene &scene);
+
     GLuint VAO;
     std::unique_ptr<ShaderProgram> shaderProgram;
     float smoothingFactor = 0.001f;

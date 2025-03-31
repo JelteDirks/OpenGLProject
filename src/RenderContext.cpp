@@ -45,8 +45,16 @@ void RenderContext::use() const
     glBindVertexArray(VAO);
 }
 
+void RenderContext::linearizeScene(Scene &scene)
+{
+}
+
 void RenderContext::render(Scene &scene, GLFWwindow &window)
 {
+    if (scene.dirty) {
+        linearizeScene(scene);
+    }
+
     int width, height;
     glfwGetFramebufferSize(&window, &width, &height);
     glViewport(0, 0, width, height);

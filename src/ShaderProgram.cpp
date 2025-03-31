@@ -13,17 +13,11 @@ ShaderProgram::ShaderProgram(const char *vertexShaderFile, const char *fragmentS
     if (getFileContent(vertexShaderFile, vertShaderSrc)) {
         std::cerr << "failed to load shader file: " << vertexShaderFile << std::endl;
         exit(EXIT_FAILURE);
-    } else {
-        std::cerr << "loaded vertex shader from file:\n"
-            << vertShaderSrc << std::endl;
     }
 
     if (getFileContent(fragmentShaderFile, fragShaderSrc)) {
         std::cerr << "failed to load shader file: " << fragmentShaderFile << std::endl;
         exit(EXIT_FAILURE);
-    } else {
-        std::cerr << "loaded fragment shader from file:\n"
-            << fragShaderSrc << std::endl;
     }
 
     vertShaderInt = glCreateShader(GL_VERTEX_SHADER);
