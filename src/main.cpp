@@ -57,9 +57,15 @@ int main(void)
     auto sphere = std::make_shared<CSGShapeNode>(CSGShape::SPHERE);
     auto uniNode = std::make_shared<CSGOperationNode>(CSGOperation::UNI);
 
-    uniNode->setLeft(box);
+    auto box2 = std::make_shared<CSGShapeNode>(CSGShape::BOX);
+    auto sphere2 = std::make_shared<CSGShapeNode>(CSGShape::SPHERE);
+
+    uniNode->setLeft(sphere2);
     uniNode->setRight(sphere);
+
     scene->addNode(uniNode);
+    scene->addNode(box2);
+    scene->addNode(box);
 
     auto x = uniNode->getChildren();
     std::cout << "x.size(): " << x.size() << std::endl;

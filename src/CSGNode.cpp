@@ -2,16 +2,25 @@
 #include "imgui.h"
 #include <memory>
 #include <vector>
+#include <string>
 
 CSGShapeNode::CSGShapeNode(CSGShape shape)
 :CSGNode(shape)
 {
 }
 
+inline std::string pointerToDecimal(const CSGNode* node) {
+    char buffer[20]; // Enough for decimal representation
+    std::snprintf(buffer, sizeof(buffer), "%llu", reinterpret_cast<unsigned long long>(node));
+    return std::string(buffer);
+}
+
 void CSGOperationNode::drawUI(std::shared_ptr<Scene> scene) const
 {
     CSGOperation op = std::get<CSGOperation>(type);
-    if (ImGui::TreeNode(to_string(op))) {
+    std::string name = std::string(to_string(op));
+    name += "##" + pointerToDecimal(this);
+    if (ImGui::TreeNode(name.c_str())) {
         ImGui::Text("Operation settings here");
         for (auto childNode : getChildren()) {
             childNode->drawUI(scene);
@@ -23,7 +32,9 @@ void CSGOperationNode::drawUI(std::shared_ptr<Scene> scene) const
 void CSGShapeNode::drawUI(std::shared_ptr<Scene> scene) const
 {
     CSGShape shape = std::get<CSGShape>(type);
-    if (ImGui::TreeNode(to_string(shape))) {
+    std::string name = std::string(to_string(shape));
+    name += "##" + pointerToDecimal(this);
+    if (ImGui::TreeNode(name.c_str())) {
         ImGui::Text("Shape settings here");
         ImGui::TreePop();
     }

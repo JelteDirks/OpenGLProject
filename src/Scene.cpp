@@ -31,15 +31,16 @@ void Scene::drawUI()
         ImGui::SliderFloat3("Camera position", (float*)&cameraPosition, -10.0, 10.0);
         ImGui::SliderFloat3("Look at", (float*)&lookAt, -10.0, 10.0);
         ImGui::SliderFloat("Field of view", (float*)&FOV, 40.0, 160.);
-    }
 
-    for (const auto &node : nodes) {
-        if (node->isOperation()) {
-            auto operation = std::static_pointer_cast<CSGOperationNode>(node);
-            operation->drawUI(shared_from_this());
-        } else if (node->isShape()) {
-            auto shapenode = std::static_pointer_cast<CSGShapeNode>(node);
-            shapenode->drawUI(shared_from_this());
+        ImGui::Text("Scene shapes");
+        for (const auto &node : nodes) {
+            if (node->isOperation()) {
+                auto operation = std::static_pointer_cast<CSGOperationNode>(node);
+                operation->drawUI(shared_from_this());
+            } else if (node->isShape()) {
+                auto shapenode = std::static_pointer_cast<CSGShapeNode>(node);
+                shapenode->drawUI(shared_from_this());
+            }
         }
     }
 
